@@ -2,7 +2,7 @@
 
 A full-stack currency converter web application with a **Python (Flask) backend** and a **vanilla HTML/CSS/JavaScript frontend**. The backend fetches live exchange rates from free APIs and falls back to hardcoded rates if offline, ensuring the converter always works.
 
-![currency-converter-demo](https://via.placeholder.com/600x300?text=Currency+Converter+Demo)
+
 
 ## Features
 
@@ -14,6 +14,9 @@ A full-stack currency converter web application with a **Python (Flask) backend*
 - Error handling for invalid inputs and network issues
 - Cross‑origin resource sharing (CORS) enabled
 
+
+  
+
 ## Tech Stack
 
 | Layer      | Technology                |
@@ -22,6 +25,8 @@ A full-stack currency converter web application with a **Python (Flask) backend*
 | Frontend   | HTML5, CSS3, JavaScript (vanilla) |
 | APIs used  | [ExchangeRate-API](https://www.exchangerate-api.com/), [Open ER API](https://open.er-api.com/) |
 | Caching    | Python dictionary with TTL (10 min) |
+
+
 
 ## Project Structure
 
@@ -35,6 +40,7 @@ currency-converter/
 
 
 
+
 ## Getting Started
 
 ### Prerequisites
@@ -43,9 +49,3 @@ currency-converter/
 - pip
 - A modern web browser (Chrome, Firefox, Edge, etc.)
 
-### Backend Setup
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/your-username/currency-converter.git
-   cd currency-converter/backend

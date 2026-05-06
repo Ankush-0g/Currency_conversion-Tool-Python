@@ -1,75 +1,51 @@
-# Currency_conversion-Tool-Python
+# 💱 Currency Converter
 
-import requests
-import json
-import sys
-from pprint import pprint
+A full-stack currency converter web application with a **Python (Flask) backend** and a **vanilla HTML/CSS/JavaScript frontend**. The backend fetches live exchange rates from free APIs and falls back to hardcoded rates if offline, ensuring the converter always works.
 
-# Replace with your own API key (store it securely!)
-API_KEY = "33ec7c73f8a4eb6b9b5b5f95118b2275"
-url = f"http://data.fixer.io/api/latest?access_key={API_KEY}"
+![currency-converter-demo](https://via.placeholder.com/600x300?text=Currency+Converter+Demo)
 
-# Fetch exchange rate data
-response = requests.get(url)
-data = response.json()
+## Features
 
-# Check if API request was successful
-if not data.get("success"):
-    print("Error fetching exchange rates. Please check your API key.")
-    sys.exit()
+- Convert between 16 major currencies (USD, EUR, GBP, INR, AUD, CAD, JPY, CNY, NZD, SGD, CHF, ZAR, SEK, NOK, MXN, HKD)
+- Live exchange rates from multiple free, no-key APIs
+- Automatic fallback to offline rates when the internet is unavailable
+- In‑memory caching to stay within API rate limits
+- Simple, responsive UI with dropdowns for currency selection
+- Error handling for invalid inputs and network issues
+- Cross‑origin resource sharing (CORS) enabled
 
-fx = data["rates"]
+## Tech Stack
 
-currencies = {c.split(" : ")[0]: c for c in [
-    "USD : US Dollar",
-    "EUR : Euro",
-    "GBP : British Pound",
-    "INR : Indian Rupee",
-    "AUD : Australian Dollar",
-    "CAD : Canadian Dollar",
-    "JPY : Japanese Yen",
-    "CNY : Chinese Yuan Renminbi",
-    "NZD : New Zealand Dollar",
-    "SGD : Singapore Dollar",
-    "CHF : Swiss Franc",
-    "ZAR : South African Rand",
-    "SEK : Swedish Krona",
-    "NOK : Norwegian Krone",
-    "MXN : Mexican Peso",
-    "HKD : Hong Kong Dollar",
-]}  # You can expand this list
+| Layer      | Technology                |
+|------------|---------------------------|
+| Backend    | Python, Flask, Flask‑CORS |
+| Frontend   | HTML5, CSS3, JavaScript (vanilla) |
+| APIs used  | [ExchangeRate-API](https://www.exchangerate-api.com/), [Open ER API](https://open.er-api.com/) |
+| Caching    | Python dictionary with TTL (10 min) |
+
+## Project Structure
+
+currency-converter/
+├── backend/
+│   ├── app.py              # Flask API server
+│   └── requirements.txt    # Python dependencies
+├── frontend/
+│   └── index.html          # User interface
+└── README.md
 
 
-def convert_currency():
-    while True:
-        query = input(
-            "Enter amount, from currency, to currency (e.g., '100 USD EUR').\n"
-            "Type 'SHOW' to list available currencies or 'Q' to quit: "
-        ).strip().upper()
- if query == "Q":
-            print("Goodbye!")
-            sys.exit()
-   elif query == "SHOW":
-            pprint(list(currencies.values()))
-            continue
 
-   try:
-            qty, fromC, toC = query.split()
-            qty = float(qty)
+## Getting Started
 
-   if fromC not in fx or toC not in fx:
-                print("Invalid currency code. Try again.")
-                continue
+### Prerequisites
 
-  amount = round(qty * fx[toC] / fx[fromC], 2)
-            print(f"{qty} {fromC} = {amount} {toC}")
+- Python 3.7 or higher
+- pip
+- A modern web browser (Chrome, Firefox, Edge, etc.)
 
- except ValueError:
-            print("Invalid input                 format. Use: '100 USD EUR'.")
+### Backend Setup
 
-  except KeyError:
-            print("Currency not found. Try again.")
-
-
-# Run the function
-convert_currency()
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/your-username/currency-converter.git
+   cd currency-converter/backend

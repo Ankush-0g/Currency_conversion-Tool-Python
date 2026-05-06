@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 500px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .converter {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin: 12px 0 5px;
+            font-weight: 600;
+            color: #333;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: background 0.2s ease;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+            color: #2c3e50;
+        }
+        .error {
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <h1>💱 Currency Converter</h1>
+    <div class="converter">
+        <label for="amount">Amount</label>
+        <input type="number" id="amount" placeholder="Enter amount" step="any" min="0.01" value="1">
+
+        <label for="fromCurrency">From</label>
+        <select id="fromCurrency"></select>
+
+        <label for="toCurrency">To</label>
+        <select id="toCurrency"></select>
+
+        <button onclick="convert()">Convert</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // Update this if your backend is running on a different port or host
+        const API_BASE = "http://localhost:5000/api";
+
+        // Fetch the list of currencies from the backend and populate the dropdowns
+        async function loadCurrencies() {
+            try {
+                const res = await fetch(`${API_BASE}/currencies`);
+                if (!res.ok) throw new Error("Failed to load currencies");
+                const currencies = await res.json();
+                const fromSelect = document.getElementById("fromCurrency");
+                const toSelect = document.getElementById("toCurrency");
+
+                // Clear any existing options
+                fromSelect.innerHTML = "";
+                toSelect.innerHTML = "";
+
+                currencies.forEach(cur => {
+                    const option = document.createElement("option");
+                    option.value = cur.code;
+                    option.textContent = `${cur.code} - ${cur.name}`;
+                    fromSelect.appendChild(option.cloneNode(true));
+                    toSelect.appendChild(option);
+                });
+
+                // Set default selections
+                fromSelect.value = "USD";
+                toSelect.value = "EUR";
+            } catch (err) {
+                showError("Could not load currencies. Is the backend running?");
+                console.error(err);
+            }
+        }
+
+        // Perform the currency conversion
+        async function convert() {
+            const amountInput = document.getElementById("amount");
+            const amount = parseFloat(amountInput.value);
+            const from = document.getElementById("fromCurrency").value;
+            const to = document.getElementById("toCurrency").value;
+            const resultDiv = document.getElementById("result");
+
+            // Client-side validation
+            if (isNaN(amount) || amount <= 0) {
+                showError("Please enter a valid positive amount.");
+                return;
+            }
+            if (!from || !to) {
+                showError("Please select both currencies.");
+                return;
+            }
+
+            const url = `${API_BASE}/convert?amount=${encodeURIComponent(amount)}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`;
+
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+
+                if (res.ok) {
+                    // Success – display the result
+                    resultDiv.innerHTML = `${data.amount} ${data.from} = <strong>${data.result} ${data.to}</strong>`;
+                    resultDiv.className = "";
+                } else {
+                    // The backend returned an error (e.g. invalid currency)
+                    showError(data.error || "Conversion failed.");
+                }
+            } catch (err) {
+                // Network error (backend down, CORS issue, etc.)
+                showError("Network error. Make sure the backend is running and accessible.");
+                console.error(err);
+            }
+        }
+
+        function showError(msg) {
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = msg;
+            resultDiv.className = "error";
+        }
+
+        // Load currencies when the page finishes loading
+        window.onload = loadCurrencies;
+    </script>
+</body>
+</html>
